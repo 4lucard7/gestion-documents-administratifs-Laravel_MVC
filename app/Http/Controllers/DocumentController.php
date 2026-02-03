@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DocumentModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
@@ -14,13 +15,16 @@ class DocumentController extends Controller
             'titre'       => 'required|string|max:150',
             'description' => 'nullable|string',
             'type'        => 'required|in:facture,contrat,rapport,autre',
-            'fichier'     => 'required|string',
+            'fichier' => $id
+                ? 'nullable|file'   // Update: fichier optionnel
+                : 'required|file',  // Create: fichier obligatoire
             'statut'      => 'required|in:en_attente,valide,rejete',
             'date_depot'  => 'required|date',
             'montant'     => 'nullable|numeric|min:0',
             'est_actif'   => 'boolean',
         ]);
     }
+
 
     public function index()
     {
@@ -41,9 +45,25 @@ class DocumentController extends Controller
 
     public function store(Request $request)
     {
-        DocumentModel::create($this->validation($request));
-        return redirect()->route('documents.index');
+        //Validation des données
+        $data = $this->validation($request);
+
+        //Vérifier si un fichier a été uploadé
+        if ($request->hasFile('fichier')) {
+            $file = $request->file('fichier');
+
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            $file->storeAs('documents', $filename, 'public');
+
+            $data['fichier'] = $filename;
+        }
+
+        DocumentModel::create($data);
+
+        return redirect()->route('documents.index')->with('success', 'Document ajouté avec succès');
     }
+
 
     public function edit($id)
     {
@@ -54,14 +74,35 @@ class DocumentController extends Controller
     public function update(Request $request, $id)
     {
         $document = DocumentModel::findOrFail($id);
-        $document->update($this->validation($request, $id));
-        return redirect()->route('documents.index');
+        $data = $this->validation($request, $id);
+
+        // Handle file upload
+        if ($request->hasFile('fichier')) {
+            // Delete old file if exists
+            if ($document->fichier && Storage::disk('public')->exists('documents/' . $document->fichier)) {
+                Storage::disk('public')->delete('documents/' . $document->fichier);
+            }
+
+            $file = $request->file('fichier');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('documents', $filename, 'public');
+            $data['fichier'] = $filename;
+        }
+
+        $document->update($data);
+        return redirect()->route('documents.index')->with('success', 'Document mis à jour avec succès');
     }
 
     public function destroy($id)
     {
         $document = DocumentModel::findOrFail($id);
+        
+        // Delete file if exists
+        if ($document->fichier && Storage::disk('public')->exists('documents/' . $document->fichier)) {
+            Storage::disk('public')->delete('documents/' . $document->fichier);
+        }
+        
         $document->delete();
-        return redirect()->route('documents.index');
+        return redirect()->route('documents.index')->with('success', 'Document supprimé avec succès');
     }
 }

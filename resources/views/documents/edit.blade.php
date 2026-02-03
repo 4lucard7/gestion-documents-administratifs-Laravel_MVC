@@ -14,7 +14,11 @@
         </div>
     @endif
 
-    <form action="{{ route('documents.update', $document->id) }}" method="POST" class="space-y-4">
+    @if(session('success'))
+        <div class="bg-green-100 text-green-700 p-2 mb-4 rounded">{{ session('success') }}</div>
+    @endif
+
+    <form action="{{ route('documents.update', $document->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
         @csrf
         @method('PUT')
 
@@ -45,7 +49,11 @@
 
         <div>
             <label class="block font-medium">Fichier</label>
-            <input type="text" name="fichier" value="{{ old('fichier', $document->fichier) }}" class="w-full border px-2 py-1 rounded">
+            @if($document->fichier)
+                <p class="text-sm text-gray-600 mb-2">Fichier actuel: <strong>{{ $document->fichier }}</strong></p>
+            @endif
+            <input type="file" name="fichier" class="w-full border px-2 py-1 rounded">
+            <p class="text-xs text-gray-500 mt-1">Laissez vide pour conserver le fichier actuel</p>
         </div>
 
         <div>

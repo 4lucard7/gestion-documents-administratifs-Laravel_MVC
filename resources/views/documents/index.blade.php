@@ -11,6 +11,10 @@
         <div class="bg-red-100 text-red-700 p-2 mb-4 rounded">{{ session('error') }}</div>
     @endif
 
+    @if(session('success'))
+        <div class="bg-green-100 text-green-700 p-2 mb-4 rounded">{{ session('success') }}</div>
+    @endif
+
     <table class="w-full table-auto border border-gray-300">
         <thead>
             <tr class="bg-gray-100">
