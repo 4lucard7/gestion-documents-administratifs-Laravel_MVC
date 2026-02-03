@@ -14,4 +14,4 @@ Route::post('/documents', [DocumentController::class, 'store'])->name("documents
 Route::get('/documents/{id}', [DocumentController::class, 'show'])->name("documents.show");
 Route::get('/documents/{id}/edit', [DocumentController::class, 'edit'])->name("documents.edit");
 Route::put('/documents/{id}', [DocumentController::class, 'update'])->name("documents.update");
-Route::delete('/documents/{id}', [DocumentController::class, 'delete'])->name("documents.delete");
+Route::delete('/documents/{id}', [DocumentController::class, 'destroy'])->name("documents.destroy");
