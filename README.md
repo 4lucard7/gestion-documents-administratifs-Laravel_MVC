@@ -203,9 +203,6 @@ Tous les formulaires incluent :
 - ✅ Ajout des messages de succès/erreur flash
 - ✅ Amélioration complète de l'interface utilisateur avec design moderne
 
-## 📄 License
-
-Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 
 ## 👨‍💻 Auteur
 
